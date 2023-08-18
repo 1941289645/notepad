@@ -1,28 +1,61 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <!-- 主体区域 -->
+  <section id="app">
+    <TodoHeader @add="handleAdd"></TodoHeader>
+    <TodoMain :list="list" @del="handleDel"></TodoMain>
+    <TodoFooter @clear="hanldeClear" :list="list"></TodoFooter>
+  </section>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TodoHeader from './components/TodoHeader.vue'
+import TodoMain from './components/TodoMain.vue'
+import TodoFooter from './components/TodoFooter.vue'
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      list:JSON.parse(localStorage.getItem('list'))||[
+        {id:1,name:'打篮球'},
+        {id:2,name:'看电影'},
+        {id:3,name:'逛街'},
+      ]
+    }
+  },
+  watch:{
+    list:{
+      deep:true,
+      handler(newVal){
+        localStorage.setItem('list',JSON.stringify(newVal))
+        if(this.list.length === 0){
+          localStorage.removeItem('list')
+        }
+      }
+    }
+  },
+  components:{
+    TodoHeader,
+    TodoMain ,
+    TodoFooter,
+  },
+  methods:{
+    handleAdd(todoName){
+      this.list.unshift({
+        id:+new Date(),
+        name:todoName
+      })
+    },
+    handleDel(id){
+      // console.log(id);
+      this.list = this.list.filter(item=>item.id !== id)
+    },
+    hanldeClear(){
+      this.list = []
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
